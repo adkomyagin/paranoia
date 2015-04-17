@@ -49,8 +49,8 @@ def distance_compute(data1,data2,num_bins):
 #for i in range(0,n):
 #   data2.append(random.gauss(0.005,0.0003))
 
-data1 = [float(line.strip()) for line in open("data01.txt", 'r')]
-data2 = [float(line.strip()) for line in open("data02.txt", 'r')]
+data1 = [float(line.strip()) for line in open("s2data1.txt", 'r')]
+data2 = [float(line.strip()) for line in open("s2data0.txt", 'r')]
 
 n1 = len(data1)
 n2 = len(data2)
@@ -63,7 +63,7 @@ n = n1
 
 
 #------- true calculation ------
-num_bins = math.ceil(2* (n ** (1 / 3.0)));
+num_bins = 10 # math.ceil(2* (n ** (1 / 3.0)));
 print "Got " + str(n) + " measurments. Using " + str(num_bins) + " bins"
 
 hist1, bin_edges = numpy.histogram(data1,bins=num_bins,density=True)
@@ -79,6 +79,8 @@ hist2, bin_edges_new = numpy.histogram(data2,bins=bin_edges,density=True)
 print "New:"
 print hist2
 print bin_edges_new
+
+print numpy.sum(hist2*numpy.diff(bin_edges))
 
 # compute L2
 l2_true = L2(hist1, hist2, bin_edges)

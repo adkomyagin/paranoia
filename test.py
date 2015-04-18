@@ -72,7 +72,7 @@ def get_bins(data1,data2,min_step):
 #for i in range(0,n):
 #   data2.append(random.gauss(0.005,0.0003))
 
-MIN_STEP = 0.0005
+MIN_STEP = 0.002
 
 data1 = [float(line.strip()) for line in open("s2data1.txt", 'r')]
 data2 = [float(line.strip()) for line in open("s2data0.txt", 'r')]
@@ -130,7 +130,6 @@ for i in range(0,5000):
 	x_data2 = random_sublist(data_concat, len(data2))
         bin_edges = get_bins(x_data1,x_data2,MIN_STEP)
 	x_l2, x_jm = distance_compute(x_data1, x_data2, bin_edges)
-        print "L2=" + str(x_l2) + ", JM=" + str(x_jm)
 	if x_l2 > l2_true: counter_l2 = counter_l2 + 1
 	if x_jm > jm_true: counter_jm = counter_jm + 1 
 	if (i%500 == 0): print str(i/50) + "% done"

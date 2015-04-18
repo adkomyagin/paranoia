@@ -30,13 +30,36 @@ def random_sublist(data,size):
 	return res
 
 # computes the L2 and JM distances for given data sets and the number of bins
-def distance_compute(data1,data2,num_bins):
-	hist1, bin_edges = numpy.histogram(data1,bins=num_bins,density=True)
+def distance_compute(data1,data2,bin_edges):
+	hist1, bin_edges = numpy.histogram(data1,bins=bin_edges,density=True)
 	hist2 = numpy.histogram(data2,bins=bin_edges,density=True)[0]
 
 	l2 = L2(hist1, hist2, bin_edges)
 	jm = JM(hist1, hist2, bin_edges)
 	return (l2,jm)
+
+# returns the array of bins
+def get_bins(data1,data2,min_step):
+        bins = []
+        num = int(math.ceil(2* (len(data1) ** (1 / 3.0))));
+        max1 = max(data1)
+        min1 = min(data1)
+        max2 = max(data2)
+        min2 = min(data2)
+        # print "Min1: " + str(min1) + ", Max1: " + str(max1) + ", Min2: " + str(min2) + ", Max2: " + str(max2)
+        # Override num if it's too precise
+        num_max = int(math.ceil(float(max1 - min1)/min_step))
+        # print "Num: " + str(num) + ", Max: " + str(num_max)
+        num = min(num, num_max)
+        step = float(max1 - min1)/num
+        for i in range(0,num+1):
+            bins.append(min1 + i*step)
+        # Add data2 boundaries if needed
+        #if min2 < min1:
+        #    bins.insert(0,min2)
+        #if max2 > max1:
+        #    bins.append(max2)
+        return bins
 
 #------- initial data ------
 #data1 = []
@@ -48,6 +71,8 @@ def distance_compute(data1,data2,num_bins):
 #
 #for i in range(0,n):
 #   data2.append(random.gauss(0.005,0.0003))
+
+MIN_STEP = 0.0005
 
 data1 = [float(line.strip()) for line in open("s2data1.txt", 'r')]
 data2 = [float(line.strip()) for line in open("s2data0.txt", 'r')]
@@ -63,10 +88,12 @@ n = n1
 
 
 #------- true calculation ------
-num_bins = 10 # math.ceil(2* (n ** (1 / 3.0)));
-print "Got " + str(n) + " measurments. Using " + str(num_bins) + " bins"
+#num_bins = 10 # math.ceil(2* (n ** (1 / 3.0)));
+#print "Got " + str(n) + " measurments. Using " + str(num_bins) + " bins"
+bin_edges = get_bins(data1,data2,MIN_STEP)
+print "Got " + str(n) + " measurments. Using " + str(len(bin_edges)) + " bins"
 
-hist1, bin_edges = numpy.histogram(data1,bins=num_bins,density=True)
+hist1, bin_edges = numpy.histogram(data1,bins=bin_edges,density=True)
 
 print "Original:"
 print hist1
@@ -101,7 +128,9 @@ for i in range(0,5000):
 	data_concat = data1 + data2
 	x_data1 = random_sublist(data_concat, len(data1))
 	x_data2 = random_sublist(data_concat, len(data2))
-	x_l2, x_jm = distance_compute(x_data1, x_data2, num_bins)
+        bin_edges = get_bins(x_data1,x_data2,MIN_STEP)
+	x_l2, x_jm = distance_compute(x_data1, x_data2, bin_edges)
+        print "L2=" + str(x_l2) + ", JM=" + str(x_jm)
 	if x_l2 > l2_true: counter_l2 = counter_l2 + 1
 	if x_jm > jm_true: counter_jm = counter_jm + 1 
 	if (i%500 == 0): print str(i/50) + "% done"
